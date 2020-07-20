@@ -24,79 +24,79 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-class Scores(db.Model):
-    __tablename__ = "scores"
+class Drivers(db.Model):
+    __tablename__ = "drivers"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    highScore = db.Column(db.String(4), nullable=False)
+    team = db.Column(db.String(100), nullable=False)
 
 
     def __init__(self, name, highScore):
         self.name = name
-        self.highScore = highScore
+        self.team = team
 
-class ScoreSchema(ma.Schema):
+class DriverSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'highScore')
+        fields = ('id', 'name', 'team')
 
-score_schema = ScoreSchema()
-scores_schema = ScoreSchema(many=True)
+driver_schema = DriverSchema()
+drivers_schema = DriverSchema(many=True)
 
 @app.route('/', methods=["GET"])
 def home():
-    return "<h1>Connect 4 high scores</h1>"
+    return "<h1>Formula One Drivers - 2020</h1>"
 
 @app.route('/wakeup', methods=['POST'])
 def auth_user():
   return str("I am awake!")
 
-@app.route('/score', methods=['POST'])
-def add_score():
+@app.route('/driver', methods=['POST'])
+def add_driver():
     name = request.json['name']
-    highScore = request.json['highScore']
+    team = request.json['team']
 
 
-    new_score = Scores(name, highScore)
+    new_driver = Drivers(name, team)
 
-    db.session.add(new_score)
+    db.session.add(new_driver)
     db.session.commit()
 
-    score = Scores.query.get(new_score.id)
-    return score_schema.jsonify(score)
+    score = Drivers.query.get(new_driver.id)
+    return driver_schema.jsonify(driver)
 
 
-@app.route('/scores', methods=["GET"])
-def get_scores():
-    all_scores = Scores.query.all()
-    result = scores_schema.dump(all_scores)
+@app.route('/drivers', methods=["GET"])
+def get_drivers():
+    all_drivers = Drivers.query.all()
+    result = drivers_schema.dump(all_drivers)
 
     return jsonify(result)
 
 
-@app.route('/score/<id>', methods=['GET'])
-def get_score(id):
-    score = Score.query.get(id)
+@app.route('/driver/<id>', methods=['GET'])
+def get_driver(id):
+    driver = Driver.query.get(id)
 
-    result = score_schema.dump(score)
+    result = driver_schema.dump(driver)
     return jsonify(result)
 
 
-@app.route('/score/<id>', methods=['PATCH'])
-def update_user(id):
-    score = Scores.query.get(id)
+@app.route('/driver/<id>', methods=['PATCH'])
+def update_driver(id):
+    driver = Drivers.query.get(id)
 
     new_name = request.json['name']
-    new_highScore = request.json['highScore']
+    new_team = request.json['team']
 
     user.name = new_name
-    user.highScore = new_highScore
+    user.team = new_team
 
     db.session.commit()
-    return score_schema.jsonify(score)
+    return driver_schema.jsonify(driver)
 
-@app.route('/score/<id>', methods=['DELETE'])
-def delete_score(id):
-    record = Score.query.get(id)
+@app.route('/driver/<id>', methods=['DELETE'])
+def delete_driver(id):
+    record = Driver.query.get(id)
     db.session.delete(record)
     db.session.commit()
 
