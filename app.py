@@ -31,7 +31,7 @@ class Drivers(db.Model):
     team = db.Column(db.String(100), nullable=False)
 
 
-    def __init__(self, name, highScore):
+    def __init__(self, name, team):
         self.name = name
         self.team = team
 
@@ -61,7 +61,7 @@ def add_driver():
     db.session.add(new_driver)
     db.session.commit()
 
-    score = Drivers.query.get(new_driver.id)
+    driver = Drivers.query.get(new_driver.id)
     return driver_schema.jsonify(driver)
 
 
